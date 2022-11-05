@@ -20,31 +20,57 @@
         Download Video
       </NuxtLink>
     </div>
-    <VideoPlayer
-      v-if="lesson.videoId"
-      :videoId="lesson.videoId"
-    />
+    <VideoPlayer v-if="lesson.videoId" :videoId="lesson.videoId" />
     <p>{{ lesson.text }}</p>
-    <LessonCompleteButton :model-value="isLessonComplete" @update:model-value="toggleComplete"/>
+    <LessonCompleteButton
+      :model-value="isLessonComplete"
+      @update:model-value="toggleLessonComplete"
+    />
   </div>
-  </template>
+</template>
 
 <script setup>
+/* -------------------------------------------------------------------------- */
+/*                                 DEPENDECIES                                */
+/* -------------------------------------------------------------------------- */
 const course = useCourse();
 const route = useRoute();
 
-const chapter = computed(() => course.chapters.find(chapter => chapter.slug === route.params.chapterSlug));
-const lesson = computed(() => chapter.value.lessons.find(lesson => lesson.slug === route.params.lessonSlug));
+/* -------------------------------------------------------------------------- */
+/*                                  PROGRESS                                  */
+/* -------------------------------------------------------------------------- */
 
-const title = (() => `${lesson.value.title} - ${course.title}`)
+const progress = useLocalStorage("progress", []);
+
+/* -------------------------------------------------------------------------- */
+/*                                   CHAPTER                                  */
+/* -------------------------------------------------------------------------- */
+
+const chapter = computed(() =>
+  course.chapters.find((chapter) => chapter.slug === route.params.chapterSlug)
+);
+const chapterNumber = computed(() => chapter.value.number - 1);
+const lesson = computed(() =>
+  chapter.value.lessons.find((lesson) => lesson.slug === route.params.lessonSlug)
+);
+
+/* -------------------------------------------------------------------------- */
+/*                                   LESSON                                   */
+/* -------------------------------------------------------------------------- */
+const lessonNumber = computed(() => lesson.value.number - 1);
+const isLessonComplete = computed(
+  () => progress.value?.[chapterNumber.value]?.[lessonNumber.value] ?? false
+);
+
+const toggleLessonComplete = () => {
+  if (!progress.value[chapterNumber.value]) progress.value[chapterNumber.value] = [];
+  progress.value[chapterNumber.value][lessonNumber.value] = !isLessonComplete.value;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                    CONFIGURATION                                   */
+/* -------------------------------------------------------------------------- */
+
+const title = () => `${lesson.value.title} - ${course.title}`;
 useHead({ title });
-
-const progress = useState('progress', () => [])
-
-const isLessonComplete = computed(() => progress.value?.[chapter.value.number -1]?.[lesson.value.number -1] ?? false);
-
-const toggleComplete = () => {
-  if(!progress.value[chapter.value.number -1]) progress.value[chapter.value.number -1] = [];
-  progress.value[chapter.value.number -1][lesson.value.number -1] = !isLessonComplete.value;
-}
 </script>

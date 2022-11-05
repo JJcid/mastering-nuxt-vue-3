@@ -29,20 +29,16 @@
             :to="lesson.path"
             :class="{
               'text-blue-500': lesson.path === $route.fullPath,
-              'text-gray-600': lesson.path !== $route.fullPath
+              'text-gray-600': lesson.path !== $route.fullPath,
             }"
           >
-            <span class="text-gray-500"
-              >{{ index + 1 }}.</span
-            >
+            <span class="text-gray-500">{{ index + 1 }}.</span>
             <span>{{ lesson.title }}</span>
           </NuxtLink>
         </div>
       </div>
 
-      <div
-        class="prose p-12 bg-white rounded-md w-[65ch]"
-      >
+      <div class="prose p-12 bg-white rounded-md w-[65ch]">
         <NuxtPage />
       </div>
     </div>
@@ -50,5 +46,5 @@
 </template>
 
 <script setup>
-  const {chapters } = useCourse();
+const { chapters } = useCourse();
 </script>
